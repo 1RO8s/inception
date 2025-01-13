@@ -1,0 +1,17 @@
+version: "1.0"
+services:
+  nginx:
+    container_name: nginx
+    image: hnagasak-nginx:1.0
+    build: ./requirements/nginx
+    ports:
+      - "443:443"
+    networks:
+      - hnagasak_network
+    extra_hosts:
+      - "hnagasak.42.fr:127.0.0.1"
+
+networks:
+  hnagasak_network:
+    name: inception_network
+    driver: bridge
