@@ -1,17 +1,68 @@
 version: "1.0"
+
 services:
   nginx:
-    container_name: nginx
+    container_name: ft-nginx
     image: hnagasak-nginx:1.0
     build: ./requirements/nginx
     ports:
       - "443:443"
+    volumes:
+      - wordpress_data:/var/www/html
     networks:
       - hnagasak_network
+    depends_on:
+      - wordpress
+    restart: always
+    environment:
+      - DOMAIN_NAME=${DOMAIN_NAME}
     extra_hosts:
-      - "hnagasak.42.fr:127.0.0.1"
+      - "${DOMAIN_NAME}:127.0.0.1"
+  wordpress:
+    container_name: ft-wordpress
+    image: hnagasak-wordpress:1.0
+    build: ./requirements/wordpress
+    ports:
+      - "9000:9000"
+    volumes:
+      - wordpress_data:/var/www/html
+    networks:
+      - hnagasak_network
+    depends_on:
+      - mariadb
+    restart: always
+    environment:
+      - MYSQL_DATABASE=${MYSQL_DATABASE}
+      - MYSQL_USER=${MYSQL_USER}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+      - WORDPRESS_ADMIN_USER=${WORDPRESS_ADMIN_USER}
+      - WORDPRESS_ADMIN_PASSWORD=${WORDPRESS_ADMIN_PASSWORD}
+      - WORDPRESS_ADMIN_EMAIL=${WORDPRESS_ADMIN_EMAIL}
+      - WORDPRESS_REGULAR_USER=${WORDPRESS_REGULAR_USER}
+      - WORDPRESS_REGULAR_PASSWORD=${WORDPRESS_REGULAR_PASSWORD}
+      - WORDPRESS_REGULAR_EMAIL=${WORDPRESS_REGULAR_EMAIL}
+    extra_hosts:
+      - "${DOMAIN_NAME}:127.0.0.1"
+  mariadb:
+    container_name: ft-mariadb
+    image: hnagasak-mariadb:1.0
+    build: ./requirements/mariadb
+    volumes:
+      - mariadb_data:/var/lib/mysql
+    networks:
+      - hnagasak_network
+    restart: always
+    environment:
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - MYSQL_DATABASE=${MYSQL_DATABASE}
+      - MYSQL_USER=${MYSQL_USER}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
 
 networks:
   hnagasak_network:
     name: inception_network
     driver: bridge
+
+volumes:
+  wordpress_data:
+  mariadb_data:
