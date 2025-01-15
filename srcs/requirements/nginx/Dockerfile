@@ -1,4 +1,5 @@
-FROM debian:bullseye
+# Use Debian 11 (penultimate stable version)
+FROM debian:11
 
 RUN apt-get update && apt-get install -y \
     nginx \
